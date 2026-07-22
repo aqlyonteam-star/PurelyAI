@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { adminAuth, adminDb } from './lib/firebase-admin';
+import { adminAuth, adminDb } from '../lib/firebase-admin';
 import { DecodedIdToken } from 'firebase-admin/auth';
 
 export interface AuthRequest extends Request {
