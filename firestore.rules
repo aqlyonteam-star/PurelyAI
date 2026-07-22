@@ -1,0 +1,66 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Helper to validate User entity
+    function isValidUser(data) {
+      return data.keys().hasAll(['email']) &&
+             data.email is string &&
+             data.email.size() <= 256;
+    }
+
+    // Helper to validate SkillHistory entity
+    function isValidSkillHistory(data) {
+      return data.keys().hasAll(['skillName', 'principles', 'progress', 'lastAccessed']) &&
+             data.keys().size() == 4 &&
+             data.skillName is string &&
+             data.skillName.size() <= 100 &&
+             data.principles is list &&
+             data.principles.size() <= 10 &&
+             data.principles.size() > 0 &&
+             data.principles[0] is string &&
+             data.progress is number &&
+             data.progress >= 0 &&
+             data.progress <= 1.0 &&
+             data.lastAccessed is int;
+    }
+
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow create, update: if isOwner(userId) && isValidUser(incoming());
+      allow delete: if isOwner(userId);
+
+      match /skills/{skillId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(skillId) && isValidSkillHistory(incoming());
+        allow update: if isOwner(userId) && isValidId(skillId) && isValidSkillHistory(incoming());
+        allow delete: if isOwner(userId) && isValidId(skillId);
+      }
+    }
+  }
+}

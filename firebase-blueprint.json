@@ -1,0 +1,54 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "A user of the application",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "lastSeen": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["email"]
+    },
+    "SkillHistory": {
+      "title": "SkillHistory",
+      "description": "A skill being learned by the user",
+      "type": "object",
+      "properties": {
+        "skillName": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "principles": {
+          "type": "array"
+        },
+        "progress": {
+          "type": "number"
+        },
+        "lastAccessed": {
+          "type": "integer"
+        }
+      },
+      "required": ["skillName", "principles", "progress", "lastAccessed"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": {
+        "$ref": "#/entities/User"
+      },
+      "description": "User profile data, updated securely."
+    },
+    "/users/{userId}/skills/{skillId}": {
+      "schema": {
+        "$ref": "#/entities/SkillHistory"
+      },
+      "description": "History and progress for each skill learned by the user."
+    }
+  }
+}
