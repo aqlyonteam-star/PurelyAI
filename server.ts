@@ -4,7 +4,7 @@ import path from 'path';
 import { createServer as createViteServer } from 'vite';
 import Groq from 'groq-sdk';
 import { Resend } from 'resend';
-import { requireAuth, AuthRequest } from './src/middleware/auth.ts';
+import { requireAuth, AuthRequest } from './middleware/auth.ts';
 
 const groqApiKey = (process.env.GROQ_API_KEY || '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').trim();
 const nvidiaApiKey = (process.env.NVIDIA_API_KEY || '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').trim();
